@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "gradia-debugging-interivew"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-17fai0lixiz6"
+s3_prefix = "gradia-debugging-interivew"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Environment=\"DEV\""
+image_repositories = []

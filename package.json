@@ -1,0 +1,57 @@
+{
+  "name": "link-shorten-api",
+  "version": "0.0.1",
+  "description": "Link shortener and redirect database",
+  "main": "",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watchAll",
+    "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet",
+    "build": "webpack-cli",
+    "dev": "NODE_ENV=development npm run watch",
+    "clean": "rimraf .aws-sam .vscode",
+    "prebuild": "rimraf .aws-sam .vscode",
+    "prewatch": "rimraf .aws-sam .vscode",
+    "watch": "webpack-cli -w",
+    "deploy:cdk:dev": "./scripts/cdk/deployDEV.sh",
+    "deploy:sam:dev": "./scripts/sam/deployDEV.sh",
+    "deploy:dev": "./scripts/deployDEV.sh",
+    "install:all": "npm install -D && npm-recursive-install",
+    "start": "ts-node src/InterviewCreateRedirectFunction/app.ts",
+    "cdk": "cdk"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GradiaHealth/gradia-link-shorten-api.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-cdk/aws-apigatewayv2": "^1.147.0",
+    "@aws-cdk/aws-apigatewayv2-integrations": "^1.147.0",
+    "@aws-cdk/aws-dynamodb": "^1.147.0",
+    "@aws-cdk/aws-iam": "^1.147.0",
+    "@aws-cdk/aws-lambda": "^1.147.0",
+    "@aws-cdk/aws-lambda-event-sources": "^1.147.0",
+    "@aws-cdk/core": "^1.147.0",
+    "aws-cdk": "^1.152.0",
+    "axios": "^0.27.2",
+    "nanoid": "^3.3.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.93",
+    "aws-sam-webpack-plugin": "^0.11.0",
+    "aws-sdk": "^2.1084.0",
+    "eslint": "^8.10.0",
+    "fork-ts-checker-webpack-plugin": "^7.2.1",
+    "jest": "^27.5.1",
+    "progress-bar-webpack-plugin": "^2.1.0",
+    "recursive-install": "^1.4.0",
+    "ts-jest": "^27.1.3",
+    "ts-loader": "^9.2.6",
+    "ts-node": "^10.5.0",
+    "typescript": "^4.6.2",
+    "webpack": "^5.69.1",
+    "webpack-cli": "^4.9.2"
+  }
+}

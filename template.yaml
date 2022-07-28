@@ -1,0 +1,130 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  Debugging interview question: Link shortener and redirect database
+
+Parameters:
+  Environment:
+    Type: String
+    Default: DEV
+    AllowedValues:
+      - DEV
+      - STAGE
+      - PROD
+
+Conditions:
+  ProdEnv: !Equals [!Ref Environment, PROD]
+  StageEnv: !Equals [!Ref Environment, STAGE]
+  DevEnv: !Equals [!Ref Environment, DEV]
+
+Globals:
+  Function:
+    # Short timeout since this is a simple function
+    Timeout: 30
+    Environment:
+      Variables:
+        # !Note To enable source map support on Lambda make sure you set the environment variable NODE_OPTIONS to --enable-source-maps for your Lambda.
+        STAGE: !If [DevEnv, DEV, PROD]
+        MAIN_TABLE_NAME: InterviewRedirectsDEV
+        NODE_OPTIONS: --enable-source-maps
+
+Resources:
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
+  InterviewCreateRedirectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/InterviewCreateRedirectFunction
+      Handler: app.lambdaHandler
+      FunctionName: !Sub ${Environment}-InterviewCreateRedirectFunction
+      Runtime: nodejs12.x
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: InterviewRedirectsDEV
+      Tags:
+        STAGE: !If [DevEnv, DEV, !If [StageEnv, STAGE, PROD]]
+  InterviewFindRedirectByURL:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/api/InterviewFindRedirectByURL
+      Handler: app.lambdaHandler
+      FunctionName: !Sub ${Environment}-InterviewFindRedirectByURL
+      Runtime: nodejs12.x
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: InterviewRedirectsDEV
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /url/{originalUrl}
+            Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+      Tags:
+        STAGE: !If [DevEnv, DEV, !If [StageEnv, STAGE, PROD]]
+  InterviewFindRedirectByCode:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/api/InterviewFindRedirectByCode
+      Handler: app.lambdaHandler
+      FunctionName: !Sub ${Environment}-InterviewFindRedirectByCode
+      Runtime: nodejs12.x
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: InterviewRedirectsDEV
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /code/{code}
+            Method: get
+            RestApiId:
+              Ref: ApiGatewayApi
+      Tags:
+        STAGE: !If [DevEnv, DEV, !If [StageEnv, STAGE, PROD]]
+  InterviewInsertRedirect:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/api/InterviewInsertRedirect
+      Handler: app.lambdaHandler
+      FunctionName: !Sub ${Environment}-InterviewInsertRedirect
+      Runtime: nodejs12.x
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: InterviewRedirectsDEV
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /redirect
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Tags:
+        STAGE: !If [DevEnv, DEV, !If [StageEnv, STAGE, PROD]]
+  InterviewResolveRedirect:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/InterviewResolveRedirect
+      Handler: app.lambdaHandler
+      FunctionName: !Sub ${Environment}-InterviewResolveRedirect
+      Runtime: nodejs12.x
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: InterviewRedirectsDEV
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /shortlink/retrieve
+            Method: post
+            RestApiId:
+              Ref: ApiGatewayApi
+      Tags:
+        STAGE: !If [DevEnv, DEV, !If [StageEnv, STAGE, PROD]]
