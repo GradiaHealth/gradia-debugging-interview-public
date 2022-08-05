@@ -35,7 +35,7 @@ Links are of the format: https://interview.gradia.com/lnk/{nanoid}
 ### CreateRedirectFunction
 
 - Is given an input event object, and then puts a redirect object in the database
-- Responsible for vinding a valid short code to use
+- Responsible for finding a valid short code to use
 - Calls external backend API to perform DB operations
 - Input Parameters:
 
